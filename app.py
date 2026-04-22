@@ -158,143 +158,171 @@ def filter_data(query: str):
     return filtered
 
 # =========================================================
-# STYLES
+# STYLE
 # =========================================================
 st.markdown("""
 <style>
 html, body, [class*="css"] {
     font-family: Inter, Arial, sans-serif;
 }
+
 [data-testid="stAppViewContainer"] {
-    background: linear-gradient(180deg, #f4f6f9 0%, #eef2f6 100%);
+    background: linear-gradient(180deg, #f5f6f8 0%, #eef1f5 100%);
 }
+
 section[data-testid="stSidebar"] {
     background: linear-gradient(180deg, #111827 0%, #1f2937 100%);
-    border-right: 1px solid rgba(255,255,255,0.06);
+    border-right: 1px solid rgba(255,255,255,0.05);
 }
+
 section[data-testid="stSidebar"] * {
     color: #f8fafc !important;
 }
+
 .block-container {
-    max-width: 1520px;
-    padding-top: 1.1rem;
+    max-width: 1540px;
+    padding-top: 1rem;
     padding-bottom: 2rem;
 }
+
 .hero-shell {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 45%, #334155 100%);
-    border-radius: 26px;
-    box-shadow: 0 24px 48px rgba(15, 23, 42, 0.18);
-    padding: 22px;
-    margin-bottom: 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #e5e7eb;
+    border-radius: 28px;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+    padding: 26px 28px;
+    margin-bottom: 18px;
 }
+
 .hero-title {
-    color: white;
-    font-size: 2.35rem;
+    color: #111827;
+    font-size: 2.25rem;
     font-weight: 800;
-    line-height: 1.06;
-    margin-bottom: 0.45rem;
+    line-height: 1.08;
+    margin-bottom: 0.35rem;
 }
+
 .hero-subtitle {
-    color: rgba(255,255,255,0.78);
+    color: #6b7280;
     font-size: 1rem;
 }
+
 .logo-box {
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.14);
-    border-radius: 20px;
-    padding: 14px;
-    height: 100%;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 24px;
+    padding: 18px;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+    min-height: 170px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
 .metric-card {
-    background: rgba(255,255,255,0.96);
-    border: 1px solid rgba(226,232,240,0.95);
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
     border-radius: 18px;
-    padding: 18px 16px;
+    padding: 20px 16px;
     text-align: center;
-    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
 }
+
 .metric-label {
-    color: #64748b;
+    color: #6b7280;
     font-size: 0.9rem;
     font-weight: 600;
     margin-bottom: 8px;
 }
+
 .metric-value {
-    color: #b91c1c;
-    font-size: 1.9rem;
+    color: #111827;
+    font-size: 1.95rem;
     font-weight: 800;
 }
+
 .panel {
-    background: rgba(255,255,255,0.96);
-    border: 1px solid rgba(226,232,240,0.95);
-    border-radius: 22px;
-    padding: 22px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 24px;
+    padding: 24px;
     margin-top: 18px;
-    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.07);
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
 }
+
 .panel-title {
-    color: #0f172a;
-    font-size: 1.24rem;
+    color: #111827;
+    font-size: 1.28rem;
     font-weight: 800;
     margin-bottom: 12px;
 }
+
 .pathline {
-    color: #64748b;
+    color: #6b7280;
     font-size: 0.94rem;
     margin-bottom: 10px;
 }
+
 .var-card {
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border-left: 6px solid #b91c1c;
+    border-left: 6px solid #991b1b;
     border-radius: 14px;
-    padding: 14px 16px;
+    padding: 15px 16px;
     margin-bottom: 10px;
     font-weight: 700;
-    color: #1e293b;
-    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+    color: #1f2937;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
 }
+
 .sidebar-card {
     background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.07);
     border-radius: 16px;
     padding: 14px;
     margin-bottom: 14px;
 }
+
 .sidebar-title {
     font-size: 0.9rem;
     font-weight: 700;
     margin-bottom: 6px;
     color: #e5e7eb !important;
 }
+
 .sidebar-value {
     font-size: 1rem;
     font-weight: 600;
     color: #ffffff !important;
 }
+
 .search-note {
-    color: #64748b;
+    color: #6b7280;
     font-size: 0.9rem;
     margin-top: 6px;
 }
+
+.stTextInput > div > div > input {
+    border-radius: 14px;
+    min-height: 46px;
+}
+
 .stButton > button {
     width: 100%;
-    min-height: 84px;
-    border-radius: 18px;
+    min-height: 112px;
+    border-radius: 20px;
     border: none;
     font-weight: 800;
-    font-size: 0.97rem;
+    font-size: 1.02rem;
     color: white;
-    background: linear-gradient(135deg, #991b1b 0%, #1d4ed8 100%);
-    box-shadow: 0 12px 25px rgba(29, 78, 216, 0.15);
+    background: linear-gradient(135deg, #991b1b 0%, #1f2937 100%);
+    box-shadow: 0 14px 28px rgba(31, 41, 55, 0.14);
     transition: all 0.18s ease;
 }
+
 .stButton > button:hover {
     transform: translateY(-2px);
     color: white;
     opacity: 0.97;
-}
-.stTextInput > div > div > input {
-    border-radius: 14px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -364,12 +392,12 @@ with st.sidebar:
 # =========================================================
 # HERO
 # =========================================================
-hero_left, hero_right = st.columns([1.25, 4.75])
+hero_left, hero_right = st.columns([1.35, 4.65])
 
 with hero_left:
     st.markdown('<div class="logo-box">', unsafe_allow_html=True)
     try:
-        st.image("inder_logo.png", width=280)
+        st.image("inder_logo.png", width=340)
     except:
         st.info("Logo dosyası için repo içine inder_logo.png yükleyin.")
     st.markdown('</div>', unsafe_allow_html=True)
@@ -379,7 +407,7 @@ with hero_right:
         """
         <div class="hero-shell">
             <div class="hero-title">Türkiye İnşaat Tedarik Sınıflandırma Sistemi</div>
-            <div class="hero-subtitle">MasterFormat tabanlı ulusal tedarik sınıflandırma altyapısı • Premium demo dashboard</div>
+            <div class="hero-subtitle">MasterFormat tabanlı ulusal tedarik sınıflandırma altyapısı • Kurumsal premium demo dashboard</div>
         </div>
         """,
         unsafe_allow_html=True
@@ -423,6 +451,7 @@ with m4:
 # =========================================================
 st.markdown('<div class="panel">', unsafe_allow_html=True)
 st.markdown('<div class="panel-title">Arama</div>', unsafe_allow_html=True)
+
 search_query = st.text_input(
     "Ara",
     value=st.session_state.search_query,
@@ -430,7 +459,11 @@ search_query = st.text_input(
     label_visibility="collapsed"
 )
 st.session_state.search_query = search_query
-st.markdown('<div class="search-note">Grup, alt grup veya ürün seviyesinde arama yapabilirsiniz.</div>', unsafe_allow_html=True)
+
+st.markdown(
+    '<div class="search-note">Grup, alt grup veya ürün seviyesinde arama yapabilirsiniz.</div>',
+    unsafe_allow_html=True
+)
 st.markdown('</div>', unsafe_allow_html=True)
 
 filtered_data = filter_data(st.session_state.search_query)
