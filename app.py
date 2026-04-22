@@ -1,15 +1,215 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title="UİTS Dashboard",
-    page_icon="🏗️",
+    page_title="UİTS – Ulusal İnşaat Tedarik Sistemi",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# -------------------------------------------------
+# =========================================================
+# BRAND / STYLE
+# =========================================================
+BRAND_BLACK = "#231F20"
+BRAND_GOLD = "#9A8457"
+BG = "#F7F6F3"
+CARD_BG = "#FFFFFF"
+BORDER = "#E7E3DB"
+TEXT_MUTED = "#6B7280"
+
+st.markdown(f"""
+<style>
+    .main {{
+        background-color: {BG};
+    }}
+
+    .block-container {{
+        max-width: 1650px;
+        padding-top: 1.2rem;
+        padding-bottom: 2rem;
+    }}
+
+    .brand-header {{
+        background: linear-gradient(180deg, #ffffff 0%, #fcfbf8 100%);
+        border: 1px solid {BORDER};
+        border-radius: 24px;
+        padding: 26px 30px 24px 30px;
+        margin-bottom: 18px;
+        box-shadow: 0 8px 26px rgba(35, 31, 32, 0.05);
+    }}
+
+    .brand-title {{
+        font-family: Georgia, "Times New Roman", serif;
+        color: {BRAND_BLACK};
+        font-size: 40px;
+        line-height: 1.05;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        margin: 0;
+    }}
+
+    .brand-subtitle {{
+        color: {TEXT_MUTED};
+        font-size: 14px;
+        margin-top: 8px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    }}
+
+    .brand-tagline {{
+        color: {BRAND_GOLD};
+        font-size: 14px;
+        margin-top: 10px;
+        font-family: Georgia, "Times New Roman", serif;
+        letter-spacing: 0.05em;
+    }}
+
+    .hero-kpi {{
+        background: {CARD_BG};
+        padding: 20px 22px;
+        border-radius: 18px;
+        border: 1px solid {BORDER};
+        box-shadow: 0 4px 14px rgba(35, 31, 32, 0.05);
+        min-height: 128px;
+    }}
+
+    .hero-kpi-label {{
+        font-size: 13px;
+        color: #475569;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }}
+
+    .hero-kpi-value {{
+        font-size: 32px;
+        color: {BRAND_BLACK};
+        font-weight: 800;
+        line-height: 1.1;
+        font-family: Georgia, "Times New Roman", serif;
+    }}
+
+    .hero-kpi-note {{
+        font-size: 11px;
+        color: {TEXT_MUTED};
+        margin-top: 8px;
+    }}
+
+    .section-card {{
+        background: {CARD_BG};
+        padding: 18px 18px 16px 18px;
+        border-radius: 18px;
+        border: 1px solid {BORDER};
+        box-shadow: 0 4px 14px rgba(35, 31, 32, 0.04);
+        margin-bottom: 16px;
+    }}
+
+    .section-title {{
+        font-size: 18px;
+        font-weight: 700;
+        color: {BRAND_BLACK};
+        margin-bottom: 10px;
+    }}
+
+    .metric-box {{
+        padding: 18px;
+        border-radius: 18px;
+        color: white;
+        min-height: 128px;
+        margin-bottom: 10px;
+        box-shadow: 0 8px 18px rgba(35, 31, 32, 0.08);
+    }}
+
+    .metric-label {{
+        font-size: 13px;
+        opacity: 0.94;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }}
+
+    .metric-value {{
+        font-size: 30px;
+        font-weight: 800;
+        line-height: 1.15;
+        font-family: Georgia, "Times New Roman", serif;
+    }}
+
+    .metric-note {{
+        font-size: 12px;
+        opacity: 0.9;
+        margin-top: 10px;
+    }}
+
+    .gold-box {{
+        background: linear-gradient(135deg, #8C7447, #B59B69);
+    }}
+
+    .black-box {{
+        background: linear-gradient(135deg, #1F1B1C, #3A3234);
+    }}
+
+    .green-box {{
+        background: linear-gradient(135deg, #0F766E, #14B8A6);
+    }}
+
+    .red-box {{
+        background: linear-gradient(135deg, #991B1B, #DC2626);
+    }}
+
+    .slate-box {{
+        background: linear-gradient(135deg, #334155, #475569);
+    }}
+
+    .purple-box {{
+        background: linear-gradient(135deg, #6D28D9, #8B5CF6);
+    }}
+
+    .path-line {{
+        font-size: 13px;
+        color: {TEXT_MUTED};
+        margin-bottom: 8px;
+    }}
+
+    .var-card {{
+        background: #FCFBF8;
+        border: 1px solid {BORDER};
+        border-left: 5px solid {BRAND_GOLD};
+        border-radius: 14px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        color: #334155;
+        font-size: 14px;
+        font-weight: 700;
+    }}
+
+    div.stButton > button {{
+        width: 100%;
+        min-height: 108px;
+        border-radius: 18px;
+        border: 1px solid {BORDER} !important;
+        background: linear-gradient(180deg, #ffffff 0%, #fbfaf7 100%) !important;
+        color: {BRAND_BLACK} !important;
+        font-weight: 800 !important;
+        font-size: 16px !important;
+        box-shadow: 0 8px 18px rgba(35, 31, 32, 0.05);
+    }}
+
+    div.stButton > button:hover {{
+        border: 1px solid {BRAND_GOLD} !important;
+        color: {BRAND_GOLD} !important;
+    }}
+
+    .sub-btn div.stButton > button {{
+        min-height: 84px !important;
+        font-size: 15px !important;
+    }}
+
+    .stTextInput label {{
+        font-weight: 600 !important;
+    }}
+</style>
+""", unsafe_allow_html=True)
+
+# =========================================================
 # DATA
-# -------------------------------------------------
+# =========================================================
 DATA = {
     "01 – Genel & Şantiye": {
         "Geçici Yapılar": ["Konteyner Ofis", "Geçici Depo", "Geçici Barınma Ünitesi"],
@@ -108,294 +308,114 @@ DATA = {
     },
 }
 
-# -------------------------------------------------
-# SESSION
-# -------------------------------------------------
-if "selected_group" not in st.session_state:
-    st.session_state.selected_group = None
-if "selected_sub" not in st.session_state:
-    st.session_state.selected_sub = None
-
-# -------------------------------------------------
+# =========================================================
 # HELPERS
-# -------------------------------------------------
+# =========================================================
 def total_subs(data):
     return sum(len(v) for v in data.values())
 
 def total_vars(data):
     return sum(len(items) for subs in data.values() for items in subs.values())
 
-def flatten_search(data, query):
-    query = query.lower().strip()
-    if not query:
+def search_filter(data, query):
+    q = query.lower().strip()
+    if not q:
         return data
-    filtered = {}
+    out = {}
     for group, subs in data.items():
-        gmatch = query in group.lower()
+        gmatch = q in group.lower()
         new_subs = {}
         for sub, vars_ in subs.items():
-            smatch = query in sub.lower()
-            matched_vars = [v for v in vars_ if query in v.lower()]
+            smatch = q in sub.lower()
+            matched_vars = [v for v in vars_ if q in v.lower()]
             if smatch:
                 new_subs[sub] = vars_
             elif matched_vars:
                 new_subs[sub] = matched_vars
         if gmatch:
-            filtered[group] = subs
+            out[group] = subs
         elif new_subs:
-            filtered[group] = new_subs
-    return filtered
+            out[group] = new_subs
+    return out
 
-# -------------------------------------------------
-# CSS
-# -------------------------------------------------
-st.markdown("""
-<style>
-.stApp {
-    background:
-        radial-gradient(circle at top left, rgba(37,99,235,0.12), transparent 28%),
-        radial-gradient(circle at top right, rgba(220,38,38,0.10), transparent 24%),
-        #f6f8fc;
-}
+# =========================================================
+# STATE
+# =========================================================
+if "selected_group" not in st.session_state:
+    st.session_state.selected_group = None
+if "selected_sub" not in st.session_state:
+    st.session_state.selected_sub = None
 
-.block-container {
-    max-width: 1500px;
-    padding-top: 1.2rem;
-    padding-bottom: 2rem;
-}
-
-.hero-wrap {
-    background: linear-gradient(135deg, #0b1220 0%, #13203b 52%, #1d4ed8 100%);
-    border-radius: 28px;
-    padding: 30px 32px;
-    color: white;
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.18);
-    border: 1px solid rgba(255,255,255,0.08);
-    margin-bottom: 18px;
-}
-
-.hero-kicker {
-    font-size: 0.95rem;
-    color: #cbd5e1;
-    margin-bottom: 8px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    font-weight: 700;
-}
-
-.hero-title {
-    font-size: 2.35rem;
-    font-weight: 800;
-    line-height: 1.1;
-    margin-bottom: 10px;
-}
-
-.hero-sub {
-    color: #dbeafe;
-    font-size: 1rem;
-    max-width: 860px;
-}
-
-.metric-card {
-    background: rgba(255,255,255,0.82);
-    backdrop-filter: blur(10px);
-    border-radius: 22px;
-    padding: 18px 18px;
-    box-shadow: 0 10px 25px rgba(15,23,42,0.08);
-    border: 1px solid rgba(255,255,255,0.7);
-    min-height: 110px;
-}
-
-.metric-label {
-    color: #64748b;
-    font-size: 0.9rem;
-    margin-bottom: 8px;
-    font-weight: 600;
-}
-
-.metric-value {
-    color: #0f172a;
-    font-size: 2rem;
-    font-weight: 800;
-    line-height: 1;
-}
-
-.metric-foot {
-    color: #94a3b8;
-    font-size: 0.8rem;
-    margin-top: 10px;
-}
-
-.panel {
-    background: rgba(255,255,255,0.84);
-    backdrop-filter: blur(10px);
-    border-radius: 24px;
-    padding: 20px;
-    box-shadow: 0 14px 30px rgba(15,23,42,0.08);
-    border: 1px solid rgba(255,255,255,0.65);
-}
-
-.panel-title {
-    color: #0f172a;
-    font-size: 1.15rem;
-    font-weight: 800;
-    margin-bottom: 10px;
-}
-
-.panel-path {
-    color: #64748b;
-    font-size: 0.92rem;
-    margin-bottom: 8px;
-}
-
-.sidebar-card {
-    background: linear-gradient(135deg, #ffffff, #f8fafc);
-    border: 1px solid #e5e7eb;
-    border-radius: 18px;
-    padding: 16px;
-    margin-bottom: 14px;
-}
-
-.sidebar-title {
-    font-size: 0.95rem;
-    font-weight: 800;
-    color: #0f172a;
-    margin-bottom: 10px;
-}
-
-div.stButton > button {
-    width: 100%;
-    border-radius: 18px;
-    border: none !important;
-    min-height: 84px;
-    font-weight: 800;
-    font-size: 0.98rem;
-    color: white !important;
-    background: linear-gradient(135deg, #dc2626 0%, #2563eb 100%) !important;
-    box-shadow: 0 10px 20px rgba(37,99,235,0.18);
-    transition: all 0.18s ease;
-}
-
-div.stButton > button:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.03);
-}
-
-.sub-btn div.stButton > button {
-    min-height: 68px !important;
-    background: linear-gradient(135deg, #0f766e 0%, #1d4ed8 100%) !important;
-    font-size: 0.95rem !important;
-}
-
-.item-card {
-    background: linear-gradient(135deg, #ffffff, #f8fafc);
-    border: 1px solid #e2e8f0;
-    border-left: 6px solid #2563eb;
-    padding: 15px 16px;
-    border-radius: 14px;
-    margin-bottom: 10px;
-    box-shadow: 0 6px 16px rgba(15,23,42,0.05);
-    font-weight: 700;
-    color: #0f172a;
-}
-
-.search-note {
-    color: #64748b;
-    font-size: 0.86rem;
-    margin-top: 4px;
-}
-
-hr {
-    margin-top: 0.6rem;
-    margin-bottom: 0.8rem;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# -------------------------------------------------
-# SIDEBAR
-# -------------------------------------------------
-with st.sidebar:
-    st.markdown('<div class="sidebar-card">', unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-title">Kontrol Paneli</div>', unsafe_allow_html=True)
-    search = st.text_input("Arama", placeholder="Grup, SUB veya VAR ara")
-    st.markdown('<div class="search-note">Sunum için hızlı filtreleme alanı</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="sidebar-card">', unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-title">Aktif Seçim</div>', unsafe_allow_html=True)
-    st.write("Grup:", st.session_state.selected_group if st.session_state.selected_group else "-")
-    st.write("SUB:", st.session_state.selected_sub if st.session_state.selected_sub else "-")
-    if st.button("Seçimi Temizle"):
-        st.session_state.selected_group = None
-        st.session_state.selected_sub = None
-    st.markdown('</div>', unsafe_allow_html=True)
-
-filtered_data = flatten_search(DATA, search)
-
-# -------------------------------------------------
-# HERO
-# -------------------------------------------------
-st.markdown("""
-<div class="hero-wrap">
-    <div class="hero-kicker">UİTS Dashboard</div>
-    <div class="hero-title">Türkiye İnşaat Tedarik Sınıflandırma Sistemi</div>
-    <div class="hero-sub">
-        MasterFormat tabanlı ulusal sınıflandırma kurgusunun görsel demo sürümü.
-        Ana grup → SUB → VAR akışı üzerinden sunum ve karar destek kullanımı için tasarlanmıştır.
-    </div>
+# =========================================================
+# HEADER
+# =========================================================
+st.markdown(f"""
+<div class="brand-header">
+    <div class="brand-title">Türkiye İnşaat Tedarik Sınıflandırma Sistemi</div>
+    <div class="brand-subtitle">UİTS • Ulusal İnşaat Tedarik Sistemi • MasterFormat Tabanlı Demo Dashboard</div>
+    <div class="brand-tagline">Malzeme sınıflandırma ve tedarik veri altyapısı</div>
 </div>
 """, unsafe_allow_html=True)
 
-# -------------------------------------------------
-# METRICS
-# -------------------------------------------------
-m1, m2, m3, m4 = st.columns(4)
+# =========================================================
+# SIDEBAR
+# =========================================================
+st.sidebar.title("Kontrol Paneli")
+search = st.sidebar.text_input("Arama", placeholder="Grup, SUB veya VAR ara")
+if st.sidebar.button("Seçimi Temizle"):
+    st.session_state.selected_group = None
+    st.session_state.selected_sub = None
 
-with m1:
+filtered_data = search_filter(DATA, search)
+
+# =========================================================
+# HERO KPI
+# =========================================================
+h1, h2, h3, h4 = st.columns(4)
+
+with h1:
     st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-label">Ana Grup</div>
-        <div class="metric-value">{len(DATA)}</div>
-        <div class="metric-foot">Toplam sınıflandırma katmanı</div>
+    <div class="hero-kpi">
+        <div class="hero-kpi-label">Ana Grup</div>
+        <div class="hero-kpi-value">{len(DATA)}</div>
+        <div class="hero-kpi-note">Ulusal sınıflandırma omurgası</div>
     </div>
     """, unsafe_allow_html=True)
 
-with m2:
+with h2:
     st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-label">SUB Sayısı</div>
-        <div class="metric-value">{total_subs(DATA)}</div>
-        <div class="metric-foot">Alt kırılım seti</div>
+    <div class="hero-kpi">
+        <div class="hero-kpi-label">SUB Sayısı</div>
+        <div class="hero-kpi-value">{total_subs(DATA)}</div>
+        <div class="hero-kpi-note">Alt kırılım katmanı</div>
     </div>
     """, unsafe_allow_html=True)
 
-with m3:
+with h3:
     st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-label">VAR Sayısı</div>
-        <div class="metric-value">{total_vars(DATA)}</div>
-        <div class="metric-foot">Gösterilen örnek kalemler</div>
+    <div class="hero-kpi">
+        <div class="hero-kpi-label">VAR Sayısı</div>
+        <div class="hero-kpi-value">{total_vars(DATA)}</div>
+        <div class="hero-kpi-note">Gösterilen örnek kalemler</div>
     </div>
     """, unsafe_allow_html=True)
 
-with m4:
+with h4:
     selected_code = st.session_state.selected_group.split(" – ")[0] if st.session_state.selected_group else "-"
     st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-label">Seçilen Grup</div>
-        <div class="metric-value">{selected_code}</div>
-        <div class="metric-foot">Aktif demo odağı</div>
+    <div class="hero-kpi">
+        <div class="hero-kpi-label">Seçilen Grup</div>
+        <div class="hero-kpi-value">{selected_code}</div>
+        <div class="hero-kpi-note">Aktif sunum odağı</div>
     </div>
     """, unsafe_allow_html=True)
 
-st.write("")
+st.divider()
 
-# -------------------------------------------------
-# GROUPS PANEL
-# -------------------------------------------------
-st.markdown('<div class="panel">', unsafe_allow_html=True)
-st.markdown('<div class="panel-title">20 Ana Grup</div>', unsafe_allow_html=True)
+# =========================================================
+# MAIN GROUPS
+# =========================================================
+st.markdown('<div class="section-card"><div class="section-title">20 Ana Grup</div>', unsafe_allow_html=True)
 
 group_names = list(filtered_data.keys())
 for row_start in range(0, len(group_names), 4):
@@ -406,19 +426,17 @@ for row_start in range(0, len(group_names), 4):
                 st.session_state.selected_group = group_name
                 st.session_state.selected_sub = None
 
-st.markdown('</div>', unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
 
-# -------------------------------------------------
-# SUB PANEL
-# -------------------------------------------------
+# =========================================================
+# SUB GROUPS
+# =========================================================
 if st.session_state.selected_group and st.session_state.selected_group in filtered_data:
-    st.write("")
-    st.markdown('<div class="panel">', unsafe_allow_html=True)
+    st.markdown('<div class="section-card"><div class="section-title">SUB Gruplar</div>', unsafe_allow_html=True)
     st.markdown(
-        f'<div class="panel-path">Ana Grup → {st.session_state.selected_group}</div>',
+        f'<div class="path-line">Ana Grup → {st.session_state.selected_group}</div>',
         unsafe_allow_html=True
     )
-    st.markdown('<div class="panel-title">SUB Gruplar</div>', unsafe_allow_html=True)
 
     sub_names = list(filtered_data[st.session_state.selected_group].keys())
     sub_cols = st.columns(min(3, max(1, len(sub_names))))
@@ -430,26 +448,24 @@ if st.session_state.selected_group and st.session_state.selected_group in filter
                 st.session_state.selected_sub = sub_name
             st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# -------------------------------------------------
-# ITEMS PANEL
-# -------------------------------------------------
+# =========================================================
+# VAR LIST
+# =========================================================
 if (
     st.session_state.selected_group
     and st.session_state.selected_sub
     and st.session_state.selected_group in filtered_data
     and st.session_state.selected_sub in filtered_data[st.session_state.selected_group]
 ):
-    st.write("")
-    st.markdown('<div class="panel">', unsafe_allow_html=True)
+    st.markdown('<div class="section-card"><div class="section-title">VAR / Kalem Listesi</div>', unsafe_allow_html=True)
     st.markdown(
-        f'<div class="panel-path">Ana Grup → {st.session_state.selected_group} → {st.session_state.selected_sub}</div>',
+        f'<div class="path-line">Ana Grup → {st.session_state.selected_group} → {st.session_state.selected_sub}</div>',
         unsafe_allow_html=True
     )
-    st.markdown('<div class="panel-title">VAR / Kalem Listesi</div>', unsafe_allow_html=True)
 
     for item in filtered_data[st.session_state.selected_group][st.session_state.selected_sub]:
-        st.markdown(f'<div class="item-card">{item}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="var-card">{item}</div>', unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
