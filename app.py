@@ -2,325 +2,109 @@ import streamlit as st
 
 st.set_page_config(
     page_title="Türkiye İnşaat Tedarik Sınıflandırma Sistemi",
-    page_icon="🏗️",
     layout="wide"
 )
 
-# -------------------------------------------------
-# DATA
-# -------------------------------------------------
-DATA = {
-    "01 – Genel & Şantiye": {
-        "Geçici Yapılar": ["Konteyner Ofis", "Geçici Depo", "Geçici Barınma Ünitesi"],
-        "İskele": ["Cephe İskelesi", "Mobil İskele", "Kalıp İskelesi"],
-        "Şantiye Ekipmanları": ["Jeneratör", "Kompresör", "Aydınlatma Kulesi"],
-    },
-    "02 – Zemin & Temel": {
-        "Kazı": ["Genel Kazı", "Kaya Kazısı", "Makinalı Kazı"],
-        "Dolgu": ["Kırmataş Dolgu", "Stabilize Dolgu", "Sıkıştırılmış Dolgu"],
-        "Zemin İyileştirme": ["Jet Grout", "Fore Kazık", "Enjeksiyon"],
-    },
-    "03 – Beton": {
-        "Hazır Beton": ["C25", "C30", "C35", "C40"],
-        "Prekast": ["Prekast Kiriş", "Prekast Döşeme", "Prekast Panel"],
-        "Katkı Kimyasalları": ["Akışkanlaştırıcı", "Priz Geciktirici", "Su Yalıtım Katkısı"],
-    },
-    "04 – Duvar & Masonry": {
-        "Tuğla": ["Dolu Tuğla", "Delikli Tuğla", "Asmolen"],
-        "Gazbeton": ["Blok", "Panel", "Lento"],
-        "Taş": ["Doğal Taş Kaplama", "Kesme Taş", "Dekoratif Taş"],
-    },
-    "05 – Metal & Çelik": {
-        "İnşaat Demiri": ["B420C", "Nervürlü Demir", "Hasır Çelik"],
-        "Profil Çelik": ["IPE", "HEA", "Kutu Profil"],
-        "Ankraj": ["Kimyasal Ankraj", "Mekanik Ankraj", "Ağır Yük Ankrajı"],
-    },
-    "06 – Ahşap & Kompozit": {
-        "Ahşap Yapı": ["Lamine Ahşap", "Masif Ahşap", "Çatı Kirişi"],
-        "MDF": ["Ham MDF", "Lamine MDF", "Neme Dayanıklı MDF"],
-        "CLT": ["CLT Panel", "CLT Döşeme", "CLT Duvar"],
-    },
-    "07 – İzolasyon & Su Yalıtımı": {
-        "Membran": ["PVC Membran", "Bitümlü Membran", "EPDM Membran"],
-        "Poliüretan": ["Sprey Köpük", "Likit Membran", "Dolgu Köpüğü"],
-        "Bitüm": ["Bitümlü Örtü", "Soğuk Uygulama", "Sıcak Uygulama"],
-    },
-    "08 – Kapı & Pencere": {
-        "Alüminyum": ["Alüminyum Doğrama", "Sürme Sistem", "Isı Yalıtımlı Doğrama"],
-        "PVC": ["PVC Pencere", "PVC Kapı", "Sürme PVC"],
-        "Çelik Kapı": ["Daire Kapısı", "Yangın Kapısı", "Villa Kapısı"],
-    },
-    "09 – İç Kaplama (Finishes)": {
-        "Boya": ["İç Cephe Boyası", "Dış Cephe Boyası", "Epoksi Boya"],
-        "Seramik": ["Duvar Seramiği", "Zemin Seramiği", "Porselen"],
-        "Parke": ["Laminat Parke", "Lamine Parke", "Masif Parke"],
-    },
-    "10 – Sabit Donatılar": {
-        "Dolap": ["Gömme Dolap", "Vestiyer", "Arşiv Dolabı"],
-        "Mutfak": ["Mutfak Dolabı", "Tezgâh", "Ankastre Modül"],
-        "Banyo": ["Lavabo Ünitesi", "Duş Sistemi", "Gömme Rezervuar"],
-    },
-    "11 – Özel Sistemler": {
-        "Asansör": ["Yolcu Asansörü", "Yük Asansörü", "Panoramik Asansör"],
-        "Yürüyen Merdiven": ["İç Mekân", "Dış Mekân", "AVM Tipi"],
-    },
-    "12 – Mobilya": {
-        "Ofis": ["Masa", "Toplantı Masası", "Dosya Dolabı"],
-        "Sabit Mobilya": ["Resepsiyon Bankosu", "Sabit Tezgâh", "Özel Üretim Raf"],
-    },
-    "13 – Endüstriyel Sistemler": {
-        "Fabrika Ekipmanları": ["Konveyör", "Endüstriyel Raf", "Makine Kaidesi"],
-    },
-    "14 – Dış Cephe": {
-        "Giydirme Cephe": ["Stick Sistem", "Panel Sistem", "Spider Sistem"],
-        "Cam Sistemleri": ["Low-E Cam", "Temperli Cam", "Lamine Cam"],
-    },
-    "15 – Mekanik (HVAC)": {
-        "Chiller": ["Hava Soğutmalı", "Su Soğutmalı", "Scroll Chiller"],
-        "VRF": ["Heat Pump", "Heat Recovery", "Mini VRF"],
-        "Klima": ["Split Klima", "Kaset Tipi", "Salon Tipi"],
-    },
-    "16 – Tesisat": {
-        "Boru": ["PPRC", "Çelik Boru", "PE Boru"],
-        "Armatür": ["Batarya", "Vana", "Mix Armatür"],
-        "Yangın": ["Sprinkler", "Yangın Dolabı", "Pompa"],
-    },
-    "17 – Elektrik": {
-        "Kablo": ["NYY", "TTR", "Data Kablosu"],
-        "Trafo": ["Kuru Tip", "Yağlı Tip", "Dağıtım Trafosu"],
-        "Pano": ["Ana Dağıtım Panosu", "Kat Panosu", "Kompanzasyon Panosu"],
-    },
-    "18 – Zayıf Akım & Dijital": {
-        "CCTV": ["IP Kamera", "NVR", "PTZ Kamera"],
-        "Fiber": ["Fiber Kablo", "Patch Panel", "ODF"],
-        "IoT": ["Sensör", "Gateway", "Akıllı Sayaç"],
-    },
-    "19 – Peyzaj & Altyapı": {
-        "Bordür": ["Beton Bordür", "Granit Bordür", "Dekoratif Bordür"],
-        "Sulama": ["Damla Sulama", "Sprink Sulama", "Kontrol Ünitesi"],
-        "Kanalizasyon": ["Koruge Boru", "Muayene Bacası", "Rögar Kapağı"],
-    },
-    "20 – Enerji & Yeni Nesil": {
-        "Güneş": ["PV Panel", "İnverter", "Taşıyıcı Konstrüksiyon"],
-        "Batarya (MCAP dahil)": ["LFP Batarya", "MCAP Modül", "Enerji Depolama Kabini"],
-        "Şarj Altyapısı": ["AC Şarj Ünitesi", "DC Hızlı Şarj", "Yük Yönetim Sistemi"],
-    },
-}
-
-# -------------------------------------------------
-# SESSION
-# -------------------------------------------------
-if "selected_group" not in st.session_state:
-    st.session_state.selected_group = None
-
-if "selected_sub" not in st.session_state:
-    st.session_state.selected_sub = None
-
-# -------------------------------------------------
-# HELPERS
-# -------------------------------------------------
-def total_sub_count():
-    return sum(len(subs) for subs in DATA.values())
-
-def total_var_count():
-    return sum(len(vars_) for subs in DATA.values() for vars_ in subs.values())
-
-# -------------------------------------------------
-# STYLE
-# -------------------------------------------------
+# ---------------------
+# CUSTOM CSS (UI)
+# ---------------------
 st.markdown("""
 <style>
-.block-container {
-    padding-top: 1.2rem;
-    padding-bottom: 2rem;
-    max-width: 1500px;
+body {
+    background-color: #f5f7fa;
 }
-.main-title {
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: #1f2937;
-    margin-bottom: 0.15rem;
-}
-.main-subtitle {
-    font-size: 1rem;
-    color: #6b7280;
-    margin-bottom: 1.2rem;
-}
-.metric-box {
+.card {
     background: white;
-    border-radius: 16px;
-    padding: 18px;
-    text-align: center;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-    border: 1px solid #eef2f7;
-}
-.metric-title {
-    font-size: 0.9rem;
-    color: #6b7280;
-    margin-bottom: 8px;
-    font-weight: 600;
-}
-.metric-value {
-    font-size: 1.7rem;
-    font-weight: 800;
-    color: #e63946;
-}
-.section-box {
-    background: white;
-    border-radius: 18px;
     padding: 20px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-    border: 1px solid #eef2f7;
-    margin-top: 18px;
-}
-.section-title {
-    font-size: 1.25rem;
-    font-weight: 800;
-    margin-bottom: 14px;
-    color: #1f2937;
-}
-.path-text {
-    color: #6b7280;
-    font-size: 0.92rem;
-    margin-bottom: 10px;
-}
-.var-box {
-    background: #f8fafc;
-    border-left: 6px solid #e63946;
-    padding: 14px 16px;
-    border-radius: 10px;
-    margin-bottom: 10px;
+    border-radius: 15px;
+    text-align: center;
     font-weight: 600;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: 0.2s;
 }
-.stButton > button {
-    width: 100%;
-    border-radius: 14px;
-    min-height: 82px;
-    font-weight: 700;
-    font-size: 0.98rem;
-    border: none;
-    background: linear-gradient(135deg, #e63946, #457b9d);
-    color: white;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.10);
+.card:hover {
+    transform: scale(1.05);
+    background: #e8f0fe;
 }
-.stButton > button:hover {
-    color: white;
-    border: none;
-    opacity: 0.95;
+.title {
+    text-align: center;
+    font-size: 32px;
+    font-weight: bold;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# -------------------------------------------------
-# HEADER
-# -------------------------------------------------
-logo_col, title_col = st.columns([1, 5])
+# ---------------------
+# LOGO
+# ---------------------
+st.image("inder_logo.png", width=200)
 
-with logo_col:
-    try:
-        st.image("inder_logo.png", use_container_width=True)
-    except:
-        st.empty()
+st.markdown('<div class="title">Türkiye İnşaat Tedarik Sınıflandırma Sistemi (MasterFormat)</div>', unsafe_allow_html=True)
 
-with title_col:
-    st.markdown(
-        '<div class="main-title">Türkiye İnşaat Tedarik Sınıflandırma Sistemi</div>',
-        unsafe_allow_html=True
-    )
-    st.markdown(
-        '<div class="main-subtitle">(MasterFormat Tabanlı)</div>',
-        unsafe_allow_html=True
-    )
+# ---------------------
+# DATA (20 GROUP SAMPLE)
+# ---------------------
+DATA = {
+    "01 - Genel": {"Alt": ["Kalem1", "Kalem2"]},
+    "02 - Zemin": {"Alt": ["Kazı", "Dolgu"]},
+    "03 - Beton": {"Alt": ["C25", "C30"]},
+    "04 - Duvar": {"Alt": ["Tuğla", "Gazbeton"]},
+    "05 - Çelik": {"Alt": ["Demir", "Profil"]},
+    "06 - Ahşap": {"Alt": ["Kaplama", "Kiriş"]},
+    "07 - İzolasyon": {"Alt": ["Su", "Isı"]},
+    "08 - Kaplama": {"Alt": ["Seramik", "Granit"]},
+    "09 - Tavan": {"Alt": ["Asma", "Alçı"]},
+    "10 - Kapı": {"Alt": ["Çelik", "Ahşap"]},
+    "11 - Pencere": {"Alt": ["PVC", "Alüminyum"]},
+    "12 - Boya": {"Alt": ["İç", "Dış"]},
+    "13 - Mekanik": {"Alt": ["HVAC", "Tesisat"]},
+    "14 - Elektrik": {"Alt": ["Kablo", "Pano"]},
+    "15 - Yangın": {"Alt": ["Sprinkler", "Alarm"]},
+    "16 - Asansör": {"Alt": ["Yolcu", "Yük"]},
+    "17 - Çevre": {"Alt": ["Peyzaj", "Altyapı"]},
+    "18 - Yol": {"Alt": ["Asfalt", "Beton"]},
+    "19 - Çatı": {"Alt": ["Membran", "Kiremit"]},
+    "20 - Özel": {"Alt": ["Akıllı Sistem", "IoT"]}
+}
 
-# -------------------------------------------------
-# METRICS
-# -------------------------------------------------
-m1, m2, m3, m4 = st.columns(4)
+# ---------------------
+# SESSION
+# ---------------------
+if "group" not in st.session_state:
+    st.session_state.group = None
 
-with m1:
-    st.markdown(
-        f'<div class="metric-box"><div class="metric-title">Ana Grup</div><div class="metric-value">{len(DATA)}</div></div>',
-        unsafe_allow_html=True
-    )
+if "sub" not in st.session_state:
+    st.session_state.sub = None
 
-with m2:
-    st.markdown(
-        f'<div class="metric-box"><div class="metric-title">SUB Sayısı</div><div class="metric-value">{total_sub_count()}</div></div>',
-        unsafe_allow_html=True
-    )
+# ---------------------
+# GROUP GRID
+# ---------------------
+st.write("## Ana Gruplar")
 
-with m3:
-    st.markdown(
-        f'<div class="metric-box"><div class="metric-title">VAR Sayısı</div><div class="metric-value">{total_var_count()}</div></div>',
-        unsafe_allow_html=True
-    )
+cols = st.columns(4)
 
-selected_code = "-"
-if st.session_state.selected_group:
-    selected_code = st.session_state.selected_group.split(" – ")[0]
+for i, g in enumerate(DATA.keys()):
+    with cols[i % 4]:
+        if st.button(g):
+            st.session_state.group = g
+            st.session_state.sub = None
 
-with m4:
-    st.markdown(
-        f'<div class="metric-box"><div class="metric-title">Seçilen Grup</div><div class="metric-value">{selected_code}</div></div>',
-        unsafe_allow_html=True
-    )
+# ---------------------
+# SUB
+# ---------------------
+if st.session_state.group:
+    st.write(f"### {st.session_state.group}")
 
-# -------------------------------------------------
-# GROUPS
-# -------------------------------------------------
-st.markdown('<div class="section-box">', unsafe_allow_html=True)
-st.markdown('<div class="section-title">20 Grup</div>', unsafe_allow_html=True)
+    for sub in DATA[st.session_state.group]:
+        if st.button(sub):
+            st.session_state.sub = sub
 
-group_names = list(DATA.keys())
+# ---------------------
+# ITEMS
+# ---------------------
+if st.session_state.group and st.session_state.sub:
+    st.write(f"### {st.session_state.sub}")
 
-for i in range(0, len(group_names), 4):
-    cols = st.columns(4)
-    row_groups = group_names[i:i+4]
-
-    for j, group in enumerate(row_groups):
-        with cols[j]:
-            if st.button(group, key=f"group_{i}_{j}"):
-                st.session_state.selected_group = group
-                st.session_state.selected_sub = None
-
-st.markdown('</div>', unsafe_allow_html=True)
-
-# -------------------------------------------------
-# SUB GROUPS
-# -------------------------------------------------
-if st.session_state.selected_group:
-    st.markdown('<div class="section-box">', unsafe_allow_html=True)
-    st.markdown(
-        f'<div class="path-text">Grup > {st.session_state.selected_group}</div>',
-        unsafe_allow_html=True
-    )
-    st.markdown('<div class="section-title">SUB Gruplar</div>', unsafe_allow_html=True)
-
-    sub_names = list(DATA[st.session_state.selected_group].keys())
-
-    for i in range(0, len(sub_names), 3):
-        cols = st.columns(3)
-        row_subs = sub_names[i:i+3]
-
-        for j, sub in enumerate(row_subs):
-            with cols[j]:
-                if st.button(sub, key=f"sub_{i}_{j}"):
-                    st.session_state.selected_sub = sub
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# -------------------------------------------------
-# VAR LIST
-# -------------------------------------------------
-if st.session_state.selected_group and st.session_state.selected_sub:
-    st.markdown('<div class="section-box">', unsafe_allow_html=True)
-    st.markdown(
-        f'<div class="path-text">Grup > {st.session_state.selected_group} > SUB > {st.session_state.selected_sub}</div>',
-        unsafe_allow_html=True
-    )
-    st.markdown('<div class="section-title">VAR Listesi</div>', unsafe_allow_html=True)
-
-    for item in DATA[st.session_state.selected_group][st.session_state.selected_sub]:
-        st.markdown(f'<div class="var-box">{item}</div>', unsafe_allow_html=True)
-
-    st.markdown('</div>', unsafe_allow_html=True)
+    for item in DATA[st.session_state.group][st.session_state.sub]:
+        st.write("•", item)
