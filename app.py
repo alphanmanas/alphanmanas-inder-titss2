@@ -1,144 +1,502 @@
 import streamlit as st
-import base64
+from datetime import datetime
 
-st.set_page_config(layout="wide")
+st.set_page_config(
+    page_title="Türkiye İnşaat Tedarik Sınıflandırma Sistemi",
+    page_icon="🏗️",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-# ---------------- COLORS ----------------
-BG = "#f6f4ef"
-CARD_BG = "#ffffff"
-BORDER = "#e7e2d9"
-BRAND_BLACK = "#1f1f1f"
-BRAND_GOLD = "#b89b5e"
-TEXT_MUTED = "#6b7280"
+# =========================================================
+# DATA
+# =========================================================
+DATA = {
+    "01 – Genel & Şantiye": {
+        "Geçici Yapılar": ["Konteyner Ofis", "Geçici Depo", "Geçici Barınma Ünitesi"],
+        "İskele": ["Cephe İskelesi", "Mobil İskele", "Kalıp İskelesi"],
+        "Şantiye Ekipmanları": ["Jeneratör", "Kompresör", "Aydınlatma Kulesi"],
+    },
+    "02 – Zemin & Temel": {
+        "Kazı": ["Genel Kazı", "Kaya Kazısı", "Makinalı Kazı"],
+        "Dolgu": ["Kırmataş Dolgu", "Stabilize Dolgu", "Sıkıştırılmış Dolgu"],
+        "Zemin İyileştirme": ["Jet Grout", "Fore Kazık", "Enjeksiyon"],
+    },
+    "03 – Beton": {
+        "Hazır Beton": ["C25", "C30", "C35", "C40"],
+        "Prekast": ["Prekast Kiriş", "Prekast Döşeme", "Prekast Panel"],
+        "Katkı Kimyasalları": ["Akışkanlaştırıcı", "Priz Geciktirici", "Su Yalıtım Katkısı"],
+    },
+    "04 – Duvar & Masonry": {
+        "Tuğla": ["Dolu Tuğla", "Delikli Tuğla", "Asmolen"],
+        "Gazbeton": ["Blok", "Panel", "Lento"],
+        "Taş": ["Doğal Taş Kaplama", "Kesme Taş", "Dekoratif Taş"],
+    },
+    "05 – Metal & Çelik": {
+        "İnşaat Demiri": ["B420C", "Nervürlü Demir", "Hasır Çelik"],
+        "Profil Çelik": ["IPE", "HEA", "Kutu Profil"],
+        "Ankraj": ["Kimyasal Ankraj", "Mekanik Ankraj", "Ağır Yük Ankrajı"],
+    },
+    "06 – Ahşap & Kompozit": {
+        "Ahşap Yapı": ["Lamine Ahşap", "Masif Ahşap", "Çatı Kirişi"],
+        "MDF": ["Ham MDF", "Lamine MDF", "Neme Dayanıklı MDF"],
+        "CLT": ["CLT Panel", "CLT Döşeme", "CLT Duvar"],
+    },
+    "07 – İzolasyon & Su Yalıtımı": {
+        "Membran": ["PVC Membran", "Bitümlü Membran", "EPDM Membran"],
+        "Poliüretan": ["Sprey Köpük", "Likit Membran", "Dolgu Köpüğü"],
+        "Bitüm": ["Bitümlü Örtü", "Soğuk Uygulama", "Sıcak Uygulama"],
+    },
+    "08 – Kapı & Pencere": {
+        "Alüminyum": ["Alüminyum Doğrama", "Sürme Sistem", "Isı Yalıtımlı Doğrama"],
+        "PVC": ["PVC Pencere", "PVC Kapı", "Sürme PVC"],
+        "Çelik Kapı": ["Daire Kapısı", "Yangın Kapısı", "Villa Kapısı"],
+    },
+    "09 – İç Kaplama (Finishes)": {
+        "Boya": ["İç Cephe Boyası", "Dış Cephe Boyası", "Epoksi Boya"],
+        "Seramik": ["Duvar Seramiği", "Zemin Seramiği", "Porselen"],
+        "Parke": ["Laminat Parke", "Lamine Parke", "Masif Parke"],
+    },
+    "10 – Sabit Donatılar": {
+        "Dolap": ["Gömme Dolap", "Vestiyer", "Arşiv Dolabı"],
+        "Mutfak": ["Mutfak Dolabı", "Tezgâh", "Ankastre Modül"],
+        "Banyo": ["Lavabo Ünitesi", "Duş Sistemi", "Gömme Rezervuar"],
+    },
+    "11 – Özel Sistemler": {
+        "Asansör": ["Yolcu Asansörü", "Yük Asansörü", "Panoramik Asansör"],
+        "Yürüyen Merdiven": ["İç Mekân", "Dış Mekân", "AVM Tipi"],
+    },
+    "12 – Mobilya": {
+        "Ofis": ["Masa", "Toplantı Masası", "Dosya Dolabı"],
+        "Sabit Mobilya": ["Resepsiyon Bankosu", "Sabit Tezgâh", "Özel Üretim Raf"],
+    },
+    "13 – Endüstriyel Sistemler": {
+        "Fabrika Ekipmanları": ["Konveyör", "Endüstriyel Raf", "Makine Kaidesi"],
+    },
+    "14 – Dış Cephe": {
+        "Giydirme Cephe": ["Stick Sistem", "Panel Sistem", "Spider Sistem"],
+        "Cam Sistemleri": ["Low-E Cam", "Temperli Cam", "Lamine Cam"],
+    },
+    "15 – Mekanik (HVAC)": {
+        "Chiller": ["Hava Soğutmalı", "Su Soğutmalı", "Scroll Chiller"],
+        "VRF": ["Heat Pump", "Heat Recovery", "Mini VRF"],
+        "Klima": ["Split Klima", "Kaset Tipi", "Salon Tipi"],
+    },
+    "16 – Tesisat": {
+        "Boru": ["PPRC", "Çelik Boru", "PE Boru"],
+        "Armatür": ["Batarya", "Vana", "Mix Armatür"],
+        "Yangın": ["Sprinkler", "Yangın Dolabı", "Pompa"],
+    },
+    "17 – Elektrik": {
+        "Kablo": ["NYY", "TTR", "Data Kablosu"],
+        "Trafo": ["Kuru Tip", "Yağlı Tip", "Dağıtım Trafosu"],
+        "Pano": ["Ana Dağıtım Panosu", "Kat Panosu", "Kompanzasyon Panosu"],
+    },
+    "18 – Zayıf Akım & Dijital": {
+        "CCTV": ["IP Kamera", "NVR", "PTZ Kamera"],
+        "Fiber": ["Fiber Kablo", "Patch Panel", "ODF"],
+        "IoT": ["Sensör", "Gateway", "Akıllı Sayaç"],
+    },
+    "19 – Peyzaj & Altyapı": {
+        "Bordür": ["Beton Bordür", "Granit Bordür", "Dekoratif Bordür"],
+        "Sulama": ["Damla Sulama", "Sprink Sulama", "Kontrol Ünitesi"],
+        "Kanalizasyon": ["Koruge Boru", "Muayene Bacası", "Rögar Kapağı"],
+    },
+    "20 – Enerji & Yeni Nesil": {
+        "Güneş": ["PV Panel", "İnverter", "Taşıyıcı Konstrüksiyon"],
+        "Batarya (MCAP dahil)": ["LFP Batarya", "MCAP Modül", "Enerji Depolama Kabini"],
+        "Şarj Altyapısı": ["AC Şarj Ünitesi", "DC Hızlı Şarj", "Yük Yönetim Sistemi"],
+    },
+}
 
-# ---------------- LOGO ----------------
-def get_base64(file):
-    with open(file, "rb") as f:
-        return base64.b64encode(f.read()).decode()
+# =========================================================
+# SESSION
+# =========================================================
+if "selected_group" not in st.session_state:
+    st.session_state.selected_group = None
 
-logo = get_base64("INDER-Logo-RGB.png")
+if "selected_sub" not in st.session_state:
+    st.session_state.selected_sub = None
 
-# ---------------- CSS ----------------
-st.markdown(f"""
+if "search_query" not in st.session_state:
+    st.session_state.search_query = ""
+
+# =========================================================
+# HELPERS
+# =========================================================
+def total_sub_count():
+    return sum(len(subs) for subs in DATA.values())
+
+def total_var_count():
+    return sum(len(vars_) for subs in DATA.values() for vars_ in subs.values())
+
+def filter_data(query: str):
+    if not query:
+        return DATA
+
+    q = query.lower().strip()
+    filtered = {}
+
+    for group, subs in DATA.items():
+        group_match = q in group.lower()
+        matched_subs = {}
+
+        for sub, vars_list in subs.items():
+            sub_match = q in sub.lower()
+            matched_vars = [v for v in vars_list if q in v.lower()]
+
+            if sub_match:
+                matched_subs[sub] = vars_list
+            elif matched_vars:
+                matched_subs[sub] = matched_vars
+
+        if group_match:
+            filtered[group] = subs
+        elif matched_subs:
+            filtered[group] = matched_subs
+
+    return filtered
+
+# =========================================================
+# STYLES
+# =========================================================
+st.markdown("""
 <style>
-
-.main {{
-    background-color: {BG};
-}}
-
-.block-container {{
-    max-width: 1650px;
-}}
-
-.brand-header {{
-    background: {CARD_BG};
-    border-radius: 22px;
-    padding: 25px;
-    border: 1px solid {BORDER};
-    margin-bottom: 20px;
-}}
-
-.brand-title {{
-    font-size: 38px;
-    font-weight: 800;
-    color: {BRAND_BLACK};
-}}
-
-.brand-sub {{
-    color: {TEXT_MUTED};
-    font-size: 14px;
-}}
-
-.kpi {{
-    background: {CARD_BG};
+html, body, [class*="css"] {
+    font-family: Inter, Arial, sans-serif;
+}
+[data-testid="stAppViewContainer"] {
+    background: linear-gradient(180deg, #f4f6f9 0%, #eef2f6 100%);
+}
+section[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #111827 0%, #1f2937 100%);
+    border-right: 1px solid rgba(255,255,255,0.06);
+}
+section[data-testid="stSidebar"] * {
+    color: #f8fafc !important;
+}
+.block-container {
+    max-width: 1520px;
+    padding-top: 1.1rem;
+    padding-bottom: 2rem;
+}
+.hero-shell {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 45%, #334155 100%);
+    border-radius: 26px;
+    box-shadow: 0 24px 48px rgba(15, 23, 42, 0.18);
     padding: 22px;
-    border-radius: 18px;
-    border: 1px solid {BORDER};
-    min-height: 130px;
-}}
-
-.kpi-title {{
-    font-size: 14px;
-    color: {TEXT_MUTED};
-}}
-
-.kpi-value {{
-    font-size: 32px;
-    font-weight: 800;
-    color: {BRAND_BLACK};
-}}
-
-.section {{
-    background: {CARD_BG};
-    padding: 20px;
-    border-radius: 18px;
-    border: 1px solid {BORDER};
-    margin-top: 20px;
-}}
-
-.group-card {{
-    padding: 20px;
-    border-radius: 18px;
+    margin-bottom: 20px;
+}
+.hero-title {
     color: white;
+    font-size: 2.35rem;
+    font-weight: 800;
+    line-height: 1.06;
+    margin-bottom: 0.45rem;
+}
+.hero-subtitle {
+    color: rgba(255,255,255,0.78);
+    font-size: 1rem;
+}
+.logo-box {
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 20px;
+    padding: 14px;
+    height: 100%;
+}
+.metric-card {
+    background: rgba(255,255,255,0.96);
+    border: 1px solid rgba(226,232,240,0.95);
+    border-radius: 18px;
+    padding: 18px 16px;
+    text-align: center;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+}
+.metric-label {
+    color: #64748b;
+    font-size: 0.9rem;
     font-weight: 600;
-    margin-bottom: 15px;
-    cursor: pointer;
-    text-align:center;
-    font-size:18px;
-}}
-
-.g1 {{ background: linear-gradient(135deg,#2c3e50,#4ca1af); }}
-.g2 {{ background: linear-gradient(135deg,#c0392b,#8e44ad); }}
-.g3 {{ background: linear-gradient(135deg,#16a085,#27ae60); }}
-.g4 {{ background: linear-gradient(135deg,#d35400,#f39c12); }}
-
+    margin-bottom: 8px;
+}
+.metric-value {
+    color: #b91c1c;
+    font-size: 1.9rem;
+    font-weight: 800;
+}
+.panel {
+    background: rgba(255,255,255,0.96);
+    border: 1px solid rgba(226,232,240,0.95);
+    border-radius: 22px;
+    padding: 22px;
+    margin-top: 18px;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.07);
+}
+.panel-title {
+    color: #0f172a;
+    font-size: 1.24rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+.pathline {
+    color: #64748b;
+    font-size: 0.94rem;
+    margin-bottom: 10px;
+}
+.var-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-left: 6px solid #b91c1c;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    font-weight: 700;
+    color: #1e293b;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+}
+.sidebar-card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 14px;
+}
+.sidebar-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #e5e7eb !important;
+}
+.sidebar-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff !important;
+}
+.search-note {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-top: 6px;
+}
+.stButton > button {
+    width: 100%;
+    min-height: 84px;
+    border-radius: 18px;
+    border: none;
+    font-weight: 800;
+    font-size: 0.97rem;
+    color: white;
+    background: linear-gradient(135deg, #991b1b 0%, #1d4ed8 100%);
+    box-shadow: 0 12px 25px rgba(29, 78, 216, 0.15);
+    transition: all 0.18s ease;
+}
+.stButton > button:hover {
+    transform: translateY(-2px);
+    color: white;
+    opacity: 0.97;
+}
+.stTextInput > div > div > input {
+    border-radius: 14px;
+}
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------- HEADER ----------------
-st.markdown(f"""
-<div class="brand-header">
-    <div style="display:flex;align-items:center;gap:20px;">
-        <img src="data:image/png;base64,{logo}" style="height:80px;">
-        <div>
-            <div class="brand-title">Türkiye İnşaat Tedarik Sınıflandırma Sistemi</div>
-            <div class="brand-sub">MasterFormat Tabanlı • İNDER Projesi</div>
+# =========================================================
+# SIDEBAR / USER PANEL
+# =========================================================
+with st.sidebar:
+    st.markdown("## Kullanıcı Paneli")
+    st.markdown(
+        """
+        <div class="sidebar-card">
+            <div class="sidebar-title">Kullanıcı</div>
+            <div class="sidebar-value">İNDER Demo Kullanıcısı</div>
         </div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        f"""
+        <div class="sidebar-card">
+            <div class="sidebar-title">Tarih</div>
+            <div class="sidebar-value">{datetime.now().strftime("%d.%m.%Y")}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        f"""
+        <div class="sidebar-card">
+            <div class="sidebar-title">Ana Grup</div>
+            <div class="sidebar-value">{len(DATA)}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        f"""
+        <div class="sidebar-card">
+            <div class="sidebar-title">SUB Sayısı</div>
+            <div class="sidebar-value">{total_sub_count()}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        f"""
+        <div class="sidebar-card">
+            <div class="sidebar-title">VAR Sayısı</div>
+            <div class="sidebar-value">{total_var_count()}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-# ---------------- KPI ----------------
-c1, c2, c3, c4 = st.columns(4)
+    selected_label = st.session_state.selected_group if st.session_state.selected_group else "Seçilmedi"
+    st.markdown(
+        f"""
+        <div class="sidebar-card">
+            <div class="sidebar-title">Aktif Grup</div>
+            <div class="sidebar-value">{selected_label}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-with c1:
-    st.markdown('<div class="kpi"><div class="kpi-title">Toplam Grup</div><div class="kpi-value">20</div></div>', unsafe_allow_html=True)
+# =========================================================
+# HERO
+# =========================================================
+hero_left, hero_right = st.columns([1.25, 4.75])
 
-with c2:
-    st.markdown('<div class="kpi"><div class="kpi-title">Alt Grup</div><div class="kpi-value">150+</div></div>', unsafe_allow_html=True)
+with hero_left:
+    st.markdown('<div class="logo-box">', unsafe_allow_html=True)
+    try:
+        st.image("inder_logo.png", width=280)
+    except:
+        st.info("Logo dosyası için repo içine inder_logo.png yükleyin.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-with c3:
-    st.markdown('<div class="kpi"><div class="kpi-title">Ürün Kalemi</div><div class="kpi-value">500+</div></div>', unsafe_allow_html=True)
+with hero_right:
+    st.markdown(
+        """
+        <div class="hero-shell">
+            <div class="hero-title">Türkiye İnşaat Tedarik Sınıflandırma Sistemi</div>
+            <div class="hero-subtitle">MasterFormat tabanlı ulusal tedarik sınıflandırma altyapısı • Premium demo dashboard</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-with c4:
-    st.markdown('<div class="kpi"><div class="kpi-title">Sistem Durumu</div><div class="kpi-value">Aktif</div></div>', unsafe_allow_html=True)
+# =========================================================
+# METRICS
+# =========================================================
+m1, m2, m3, m4 = st.columns(4)
 
-# ---------------- GROUPS ----------------
-st.markdown('<div class="section"><b>MasterFormat Grupları</b></div>', unsafe_allow_html=True)
+with m1:
+    st.markdown(
+        f'<div class="metric-card"><div class="metric-label">Ana Grup</div><div class="metric-value">{len(DATA)}</div></div>',
+        unsafe_allow_html=True
+    )
 
-cols = st.columns(4)
+with m2:
+    st.markdown(
+        f'<div class="metric-card"><div class="metric-label">SUB Sayısı</div><div class="metric-value">{total_sub_count()}</div></div>',
+        unsafe_allow_html=True
+    )
 
-groups = [
-("01 Genel Şartlar","g1"),
-("02 Mevcut Koşullar","g2"),
-("03 Beton","g3"),
-("04 Duvar","g4"),
-("05 Metaller","g1"),
-("06 Ahşap","g2"),
-("07 Isı Yalıtım","g3"),
-("08 Kapı Pencere","g4")
-]
+with m3:
+    st.markdown(
+        f'<div class="metric-card"><div class="metric-label">VAR Sayısı</div><div class="metric-value">{total_var_count()}</div></div>',
+        unsafe_allow_html=True
+    )
 
-for i,(g,cls) in enumerate(groups):
-    with cols[i%4]:
-        st.markdown(f'<div class="group-card {cls}">{g}</div>', unsafe_allow_html=True)
+selected_code = "-"
+if st.session_state.selected_group:
+    selected_code = st.session_state.selected_group.split(" – ")[0]
+
+with m4:
+    st.markdown(
+        f'<div class="metric-card"><div class="metric-label">Seçilen Grup</div><div class="metric-value">{selected_code}</div></div>',
+        unsafe_allow_html=True
+    )
+
+# =========================================================
+# SEARCH
+# =========================================================
+st.markdown('<div class="panel">', unsafe_allow_html=True)
+st.markdown('<div class="panel-title">Arama</div>', unsafe_allow_html=True)
+search_query = st.text_input(
+    "Ara",
+    value=st.session_state.search_query,
+    placeholder="Grup, SUB veya VAR ara",
+    label_visibility="collapsed"
+)
+st.session_state.search_query = search_query
+st.markdown('<div class="search-note">Grup, alt grup veya ürün seviyesinde arama yapabilirsiniz.</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+
+filtered_data = filter_data(st.session_state.search_query)
+
+# =========================================================
+# GROUPS
+# =========================================================
+st.markdown('<div class="panel">', unsafe_allow_html=True)
+st.markdown('<div class="panel-title">20 Grup</div>', unsafe_allow_html=True)
+
+groups = list(filtered_data.keys())
+
+if not groups:
+    st.warning("Arama kriterine uygun grup bulunamadı.")
+else:
+    for i in range(0, len(groups), 4):
+        cols = st.columns(4)
+        row = groups[i:i+4]
+        for j, group in enumerate(row):
+            with cols[j]:
+                if st.button(group, key=f"group_{i}_{j}"):
+                    st.session_state.selected_group = group
+                    st.session_state.selected_sub = None
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# =========================================================
+# SUBS
+# =========================================================
+if st.session_state.selected_group and st.session_state.selected_group in DATA:
+    st.markdown('<div class="panel">', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="pathline">Grup > {st.session_state.selected_group}</div>',
+        unsafe_allow_html=True
+    )
+    st.markdown('<div class="panel-title">SUB Gruplar</div>', unsafe_allow_html=True)
+
+    subs = list(DATA[st.session_state.selected_group].keys())
+
+    for i in range(0, len(subs), 3):
+        cols = st.columns(3)
+        row = subs[i:i+3]
+        for j, sub in enumerate(row):
+            with cols[j]:
+                if st.button(sub, key=f"sub_{i}_{j}"):
+                    st.session_state.selected_sub = sub
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# =========================================================
+# VARS
+# =========================================================
+if (
+    st.session_state.selected_group
+    and st.session_state.selected_sub
+    and st.session_state.selected_group in DATA
+    and st.session_state.selected_sub in DATA[st.session_state.selected_group]
+):
+    st.markdown('<div class="panel">', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="pathline">Grup > {st.session_state.selected_group} > SUB > {st.session_state.selected_sub}</div>',
+        unsafe_allow_html=True
+    )
+    st.markdown('<div class="panel-title">VAR Listesi</div>', unsafe_allow_html=True)
+
+    for item in DATA[st.session_state.selected_group][st.session_state.selected_sub]:
+        st.markdown(f'<div class="var-card">{item}</div>', unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
